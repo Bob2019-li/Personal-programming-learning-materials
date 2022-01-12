@@ -1,0 +1,235 @@
+wmctrl 1.07
+Usage: wmctrl [OPTION]...
+Actions:
+  -m                   Show information about the window manager and
+                       about the environment.
+                       显示有关窗口管理器和环境的信息。
+
+  -l                   List windows managed by the window manager.
+                       列出由窗口管理器管理的窗口
+
+  -d                   List desktops. The current desktop is marked
+                       with an asterisk.
+                       列出桌面。当前桌面用星号标记。
+
+  -j                   List current desktop.
+                       列出当前桌面。
+
+  -s <DESK>            Switch to the specified desktop.
+                       切换到指定的桌面。【注意是桌面不是窗口】
+
+  -a <WIN>             Activate the window by switching to its desktop and
+                       raising it.
+                       通过切换到桌面并将其升高来激活窗口 
+
+  -c <WIN>             Close the window gracefully.
+                       优雅地关上窗户，应该是不强制关闭，安全的关闭
+
+  -R <WIN>             Move the window to the current desktop and
+                       activate it.
+                       将窗口移动到当前桌面并激活它。【目前感觉效果和 -a <WIN> 相同】
+
+  -r <WIN> -t <DESK>   Move the window to the specified desktop.
+                       将窗口移动到指定的桌面。
+
+  -r <WIN> -e <MVARG>  Resize and move the window around the desktop.
+                       The format of the <MVARG> argument is described below.
+                       在桌面上调整窗口大小并移动窗口。
+
+                       wmctrl -r Google -e 0,100,100,200,200  大概这么用 e 后面的第一个参数是 Gravity(翻译过来是重力)，目前就填0 其他参数分别是界面起始坐标以及宽高
+
+  -r <WIN> -y <MVARG>  Resize and move like above, then reactivate.
+                       按上述方式调整大小和移动，然后重新激活。
+
+                       
+  -r <WIN> -b <STARG>  Change the state of the window. Using this option it's
+                       possible for example to make the window maximized,
+                       minimized or fullscreen. The format of the <STARG>
+                       argument and list of possible states is given below.
+                       更改窗口的状态。例如，使用此选项可以使窗口最大化、最小化或全屏显示。<STARG>参数的格式和可能状态列表如下所示。
+
+                       【目前没搞懂】
+
+  -r <WIN> -N <STR>    Set the name (long title) of the window.
+                       设置窗口的名称（长标题）。
+
+                       
+  -r <WIN> -I <STR>    Set the icon name (short title) of the window.
+                       设置窗口的图标名称（短标题）。
+
+  -r <WIN> -T <STR>    Set both the name and the icon name of the window.
+                       设置窗口的名称和图标名称。
+
+
+
+  -k (on|off)          Activate or deactivate window manager's
+                       "showing the desktop" mode. Many window managers
+                       do not implement this mode.
+                       激活或停用窗口管理器的“显示桌面”模式。许多窗口管理器不实现此模式。
+
+                       【目前没搞懂】
+
+
+  -o <X>,<Y>           Change the viewport for the current desktop.
+                       The X and Y values are separated with a comma.
+                       They define the top left corner of the viewport.
+                       The window manager may ignore the request.
+                       更改当前桌面的视口。X和Y值用逗号分隔。它们定义视口的左上角。窗口管理器可能会忽略该请求。
+
+                       【目前没搞懂】
+                       
+  -n <NUM>             Change number of desktops.
+                       The window manager may ignore the request.
+                       更改桌面的数量。窗口管理器可能会忽略该请求。
+
+  -g <W>,<H>           Change geometry (common size) of all desktops.
+                       The window manager may ignore the request.
+                       更改所有桌面的几何图形（通用大小）。窗口管理器可能会忽略该请求。
+
+  -h                   Print help.
+
+Options:
+  -i                   Interpret <WIN> as a numerical window ID.
+                       将<WIN>解释为数字窗口ID。
+
+  -p                   Include PIDs in the window list. Very few
+                       X applications support this feature.
+                       在窗口列表中包括PID。很少X应用程序支持此功能。
+
+  -G                   Include geometry in the window list.
+                       在窗口列表中包括几何图形。
+
+  -x                   Include WM_CLASS in the window list or
+                       interpret <WIN> as the WM_CLASS name.
+  -u                   Override auto-detection and force UTF-8 mode.
+                       在窗口列表中包括WM_类或将<WIN>解释为WM_类名称-u超越自动检测并强制UTF-8模式。
+
+  -F                   Modifies the behavior of the window title matching
+                       algorithm. It will match only the full window title
+                       instead of a substring, when this option is used.
+                       Furthermore it makes the matching case sensitive.
+                       修改窗口标题匹配算法的行为。使用此选项时，它将仅匹配完整的窗口标题，而不是子字符串。此外，它使匹配区分大小写。
+
+  -v                   Be verbose. Useful for debugging.
+                       要冗长。用于调试。
+
+  -w <WA>              Use a workaround. The option may appear multiple
+                       times. List of available workarounds is given below.
+                       使用变通方法。该选项可能会出现多次。下面给出了可用的解决方法列表。
+
+Arguments:
+  <WIN>                This argument specifies the window. By default it's
+                       interpreted as a string. The string is matched
+                       against the window titles and the first matching
+                       window is used. The matching isn't case sensitive
+                       and the string may appear in any position
+                       of the title.
+                       此参数指定窗口。默认情况下，它被解释为字符串。字符串与窗口标题匹配，并使用第一个匹配窗口。匹配不区分大小写，字符串可能出现在标题的任何位置。
+
+                       The -i option may be used to interpret the argument
+                       as a numerical window ID represented as a decimal
+                       number. If it starts with "0x", then
+                       it will be interpreted as a hexadecimal number.
+                       -i选项可用于将参数解释为以十进制数表示的数字窗口ID。如果它以“0x”开头，那么它将被解释为十六进制数。
+
+                       The -x option may be used to interpret the argument
+                       as a string, which is matched against the window's
+                       class name (WM_CLASS property). Th first matching
+                       window is used. The matching isn't case sensitive
+                       and the string may appear in any position
+                       of the class name. So it's recommended to  always use
+                       the -F option in conjunction with the -x option.
+                       -x选项可用于将参数解释为字符串，该字符串与窗口的类名（WM_class属性）匹配。使用第一个匹配窗口。匹配不区分大小写，字符串可能出现在类名的任何位置。因此，建议始终将-F选项与-x选项结合使用。
+
+                       The special string ":SELECT:" (without the quotes)
+                       may be used to instruct wmctrl to let you select the
+                       window by clicking on it.
+                       特殊字符串“：SELECT:”（不带引号）可用于指示wmctrl让您通过单击窗口来选择窗口。
+
+
+                       The special string ":ACTIVE:" (without the quotes)
+                       may be used to instruct wmctrl to use the currently
+                       active window for the action.
+                       特殊字符串“：ACTIVE:”（不带引号）可用于指示wmctrl使用当前活动窗口执行操作。
+
+
+  <DESK>               A desktop number. Desktops are counted from zero.
+                       一个桌面号码。台式机从零开始计数。
+
+  <MVARG>              Specifies a change to the position and size
+                       of the window. The format of the argument is:
+                       指定对窗口位置和大小的更改。参数的格式为：
+
+                       <G>,<X>,<Y>,<W>,<H>
+
+                       <G>: Gravity specified as a number. The numbers are
+                          defined in the EWMH specification. The value of
+                          zero is particularly useful, it means "use the
+                          default gravity of the window".
+                          指定为数字的重力。编号在EWMH规范中定义。零值特别有用，它意味着“使用窗口的默认重力”。
+
+                       <X>,<Y>: Coordinates of new position of the window.
+                                窗口新位置的坐标。
+                       <W>,<H>: New width and height of the window.
+                                新窗口的宽度和高度。
+
+                       The value of -1 may appear in place of
+                       any of the <X>, <Y>, <W> and <H> properties
+                       to left the property unchanged.
+                       值-1可以代替任何<X>、<Y>、<W>和<H>属性，使属性保持不变。
+
+  <STARG>              Specifies a change to the state of the window
+                       by the means of _NET_WM_STATE request.
+                       This option allows two properties to be changed
+                       simultaneously, specifically to allow both
+                       horizontal and vertical maximization to be
+                       altered together.
+                       通过_NET_WM_state请求指定对窗口状态的更改。此选项允许同时更改两个属性，特别是允许同时更改水平最大化和垂直最大化。
+
+                       The format of the argument is:
+
+                       (remove|add|toggle),<PROP1>[,<PROP2>]
+                                    切换     
+
+                       The EWMH specification defines the
+                       following properties:
+                       EWMH规范定义了以下属性：
+
+                           modal, sticky, maximized_vert, maximized_horz,
+                           shaded, skip_taskbar, skip_pager, hidden,
+                           fullscreen, above, below
+                           模态、粘性、最大垂直、最大水平、着色、跳过任务栏、跳过寻呼机、隐藏、全屏、上方、下方
+
+Workarounds:
+解决办法：
+
+  DESKTOP_TITLES_INVALID_UTF8      Print non-ASCII desktop titles correctly
+                                   when using Window Maker.
+                                   使用Window Maker时正确打印非ASCII桌面标题。
+
+The format of the window list:
+窗口列表的格式：
+  <window ID> <desktop ID> <client machine> <window title>
+
+The format of the desktop list:
+桌面列表的格式：
+  <desktop ID> [-*] <geometry> <viewport> <workarea> <title>
+
+
+Author, current maintainer: Tomas Styblo <tripie@cpan.org>
+Released under the GNU General Public License.
+Copyright (C) 2003
+
+
+=================================================================================================
+
+
+说明  标志的填写方式
+
+<WIN>  窗口的标题   下面的 trans res 、wmctrl — Dolphin 都是标题
+0x05c00006  0 lizequanComputer   wmctrl — Dolphin 
+0x05e00001  0 lizequanComputer   wmctrl.txt - Visual Studio Code
+0x0540002c  0 lizequanComputer   trans res
+
+
+wmctrl -p -l   列出所有窗口以及 窗口程序的pid
