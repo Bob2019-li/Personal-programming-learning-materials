@@ -1,0 +1,4 @@
+在 /usr/local/bin 下设置软连接
+
+ln -s 源可执行文件或者脚本  /usr/local/bin/新命令
+
