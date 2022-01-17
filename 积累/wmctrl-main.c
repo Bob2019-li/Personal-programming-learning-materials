@@ -10,11 +10,13 @@
 #include <X11/Xmu/WinUtil.h>
 #include <glib.h>
 
-#define _NET_WM_STATE_REMOVE        0    /* remove/unset property */
-#define _NET_WM_STATE_ADD           1    /* add/set property */
-#define _NET_WM_STATE_TOGGLE        2    /* toggle property  */
 
-/* help {{{ */
+/*对属性的设置*/
+#define _NET_WM_STATE_REMOVE        0    /* remove/unset property */
+#define _NET_WM_STATE_ADD           1    /* add/set property      */
+#define _NET_WM_STATE_TOGGLE        2    /* toggle property       */
+
+/*很暴力的将help 输出出来*/
 #define HELP "wmctrl " VERSION "\n" \
 "Usage: wmctrl [OPTION]...\n" \
 "Actions:\n" \
@@ -152,7 +154,7 @@
 "Author, current maintainer: Tomas Styblo <tripie@cpan.org>\n" \
 "Released under the GNU General Public License.\n" \
 "Copyright (C) 2003\n"
-/* }}} */
+
 
 #define MAX_PROPERTY_VALUE_LEN 4096
 #define SELECT_WINDOW_MAGIC ":SELECT:"
@@ -162,7 +164,7 @@
     fprintf(stderr, __VA_ARGS__); \
 }
 
-/* declarations of static functions *//*{{{*/
+/* declarations of static functions 声明静态函数 可能是全局函数吧就生成静态的了*/
 static gboolean wm_supports (Display *disp, const gchar *prop);
 static Window *get_client_list (Display *disp, unsigned long *size);
 static int client_msg(Display *disp, Window win, char *msg, 
@@ -198,39 +200,50 @@ static int window_state (Display *disp, Window win, char *arg);
 static Window Select_Window(Display *dpy);
 static Window get_active_window(Display *dpy);
 
-/*}}}*/
    
 //选项的结构体
 static struct {
-    int verbose;
-    int force_utf8;
-    int show_class;
-    int show_pid;
-    int show_geometry;
-    int match_by_id;
+    int verbose;     //冗长的
+    int force_utf8;  //强制utf8
+    int show_class;  
+    int show_pid;    //展示pid
+    int show_geometry; //显示几何参数
+    int match_by_id;   //按照id匹配
 	int match_by_cls;
-    int full_window_title_match;
-    int wa_desktop_titles_invalid_utf8;
-    char *param_window;
+    int full_window_title_match;//以全字符的形式匹配窗口
+    int wa_desktop_titles_invalid_utf8; //好像是和编码有关的，如果标题文字用问题就试试这个选项
+    char *param_window; //窗口标题
     char *param;
 } options;
 
+/*gboolean 是glib 下的类型 表示布尔值*/
 static gboolean envir_utf8;
 
-int main (int argc, char **argv) { /* {{{ */
+
+
+//=========================================================程序主体=========================================================
+int main (int argc, char **argv) 
+{
     int opt;
-    int action = 0;
+    int action = 0;        //选择中的参数
     int ret = EXIT_SUCCESS;
     int missing_option = 1;
     Display *disp;
 
     memset(&options, 0, sizeof(options)); /* just for sure */
     
-    /* necessary to make g_get_charset() and g_locale_*() work */
+    /* necessary to make g_get_charset() and g_locale_*() work  设置地域化信息的C函数  详情见 https://blog.csdn.net/kunyus/article/details/104628559/ */
     setlocale(LC_ALL, "");
     
-    /* make "--help" and "--version" work. I don't want to use getopt_long for portability reasons */
-    if (argc == 2 && argv[1]) {
+    /* make "--help" and "--version" work. I don't want to use getopt_long for portability reasons 可能是作者觉得用这个函数太麻烦了毕竟就两个选项*/
+    /* int getopt_long(int argc, 
+                       char * const argv[], 
+                       const char *optstring, 
+                       const struct option *longopts, 
+                       int *longindex);
+    */
+    if (argc == 2 && argv[1]) 
+    {//输入两个参数的情况下 也就是输入 --help --version 注意调用命令也是一个参数
         if (strcmp(argv[1], "--help") == 0) {
             fputs(HELP, stdout);
             return EXIT_SUCCESS;
@@ -241,10 +254,17 @@ int main (int argc, char **argv) { /* {{{ */
         }
     }
      
-    /*getopt函数  解析输入的命令行参数*/
-    while ((opt = getopt(argc, argv, "FGVvhlupidjmxa:r:s:c:t:w:k:o:n:g:e:y:b:z:E:N:I:T:R:")) != -1) {
+    /*getopt函数  解析输入的命令行参数
+      稍微说一下第三个参数，是个字符串getopt会解析这个字符串再结合前面两个参数就知道你输入的对不对和输入的什么选项
+      从网上查了一下 单个字符表示选项 比如下面的 FGVvhlupidjmx 就是选项用的使用就是 -F 或者 -G ... 这么用
+                   单个字符后面一个冒号表示后面必须要有一个参数  比如 a:r:s:c:t:w:k:o:n:g:e:y:b:z:E:N:I:T:R: 使用的时候 -a xxx  ....
+      如果检查没有对应的选项 就返回 -1
+    */
+    while ((opt = getopt(argc, argv, "FGVvhlupidjmxa:r:s:c:t:w:k:o:n:g:e:y:b:z:E:N:I:T:R:")) != -1) 
+    {
         missing_option = 0;
-        switch (opt) { //根据选项赋值
+        switch (opt) 
+        { //根据选项赋值
             case 'F':
                 options.full_window_title_match = 1;
                 break;
@@ -268,7 +288,7 @@ int main (int argc, char **argv) { /* {{{ */
                 options.show_pid = 1;
                 break;
             case 'a': case 'c': case 'R': case 'z': case 'E':
-                options.param_window = optarg;
+                options.param_window = optarg;  //变量optarg  ——   指向当前选项参数（如果有）的指针 这个变量好像在别的文件中直接用就行了
                 action = opt;
                 break;
             case 'r':
@@ -302,14 +322,15 @@ int main (int argc, char **argv) { /* {{{ */
         }
     }
    
-    if (missing_option) {
+    if (missing_option) 
+    {//一个标志量 检测输入参数是否正确
         fputs(HELP, stderr);
         return EXIT_FAILURE;
     }
    
-    init_charset();
+    init_charset(); //还是有关本地环境的检测和设置
     
-    if (! (disp = XOpenDisplay(NULL))) {
+    if (! (disp = XOpenDisplay(NULL))) { //XLib 库的函数
         fputs("Cannot open display.\n", stderr);
         return EXIT_FAILURE;
     }
@@ -325,28 +346,29 @@ int main (int argc, char **argv) { /* {{{ */
             ret = list_windows(disp);  //窗口列表
             break;
         case 'j':
-            ret = list_current_desktop(disp);
+            ret = list_current_desktop(disp); //当前的桌面
             break;
         case 'd':
-            ret = list_desktops(disp);
+            ret = list_desktops(disp); //桌面列表
             break;
         case 's':
-            ret = switch_desktop(disp);
+            ret = switch_desktop(disp); //切换桌面
             break;
         case 'm':
-            ret = wm_info(disp);
+            ret = wm_info(disp);        //输出窗口管理器的信息
             break;
         case 'a': case 'c': case 'R': case 'z': case 'E':
         case 't': case 'e': case 'b': case 'N': case 'I': case 'T': case 'y':
-            if (! options.param_window) {
+            if (! options.param_window) { 
+                //如果指针是空的说明没有传入窗口标题
                 fputs("No window was specified.\n", stderr);
                 return EXIT_FAILURE;
             }
-            if (options.match_by_id) {
+            if (options.match_by_id) { //按照id匹配
                 ret = action_window_pid(disp, action);
             }
-            else {
-                ret = action_window_str(disp, action);  //
+            else {// 按照窗口标题匹配
+                ret = action_window_str(disp, action);  
             }
             break;
         case 'k':
@@ -366,10 +388,13 @@ int main (int argc, char **argv) { /* {{{ */
     XCloseDisplay(disp);
     return ret;
 }
-/* }}} */
+//=======================================================================================================================
 
-static void init_charset (void) {/*{{{*/
+
+static void init_charset (void) {
+
   const gchar *charset; /* unused */
+
   gchar *lang = getenv("LANG") ? g_ascii_strup(getenv("LANG"), -1) : NULL; 
   gchar *lc_ctype = getenv("LC_CTYPE") ? g_ascii_strup(getenv("LC_CTYPE"), -1) : NULL;
 
@@ -391,12 +416,16 @@ static void init_charset (void) {/*{{{*/
     envir_utf8 = TRUE;
   }
   p_verbose("envir_utf8: %d\n", envir_utf8);
-}/*}}}*/
+}
 
-static int client_msg(Display *disp, Window win, char *msg, /* {{{ */
-    unsigned long data0, unsigned long data1, 
-    unsigned long data2, unsigned long data3,
-    unsigned long data4) {
+static int client_msg(Display *disp, 
+                      Window win, 
+                      char *msg, 
+                      unsigned long data0, 
+                      unsigned long data1, 
+                      unsigned long data2, 
+                      unsigned long data3,
+                      unsigned long data4) {
   XEvent event;
   long mask = SubstructureRedirectMask | SubstructureNotifyMask;
 
@@ -419,7 +448,13 @@ static int client_msg(Display *disp, Window win, char *msg, /* {{{ */
     fprintf(stderr, "Cannot send %s event.\n", msg);
     return EXIT_FAILURE;
   }
-}/*}}}*/
+}
+
+
+
+
+
+
 
 static gchar *get_output_str (gchar *str, gboolean is_utf8) {/*{{{*/
   gchar *out;
@@ -1295,21 +1330,24 @@ static Window *get_client_list (Display *disp, unsigned long *size) {/*{{{*/
     return client_list;
 }/*}}}*/
 
-static int list_windows (Display *disp) {/*{{{*/
+static int list_windows (Display *disp) 
+{
     Window *client_list;
     unsigned long client_list_size;
     int i;
     int max_client_machine_len = 0;
     
-    if ((client_list = get_client_list(disp, &client_list_size)) == NULL) {
+    if ((client_list = get_client_list(disp, &client_list_size)) == NULL) 
+    {
         return EXIT_FAILURE; 
     }
     
     /* find the longest client_machine name */
-    for (i = 0; i < client_list_size / sizeof(Window); i++) {
+    for (i = 0; i < client_list_size / sizeof(Window); i++) 
+    {
         gchar *client_machine;
-        if ((client_machine = get_property(disp, client_list[i],
-                XA_STRING, "WM_CLIENT_MACHINE", NULL))) {
+        if ((client_machine = get_property(disp, client_list[i],XA_STRING, "WM_CLIENT_MACHINE", NULL))) 
+        {
             max_client_machine_len = strlen(client_machine);    
         }
         g_free(client_machine);
@@ -1319,9 +1357,12 @@ static int list_windows (Display *disp) {/*{{{*/
     for (i = 0; i < client_list_size / sizeof(Window); i++) 
     {
         gchar *title_utf8 = get_window_title(disp, client_list[i]); /* UTF8 */
-        gchar *title_out = get_output_str(title_utf8, TRUE);
+
+        gchar *title_out  = get_output_str(title_utf8, TRUE);
+
         gchar *client_machine;
-        gchar *class_out = get_window_class(disp, client_list[i]); /* UTF8 */
+
+        gchar *class_out  = get_window_class(disp, client_list[i]); /* UTF8 */
         unsigned long *pid;
         unsigned long *desktop;
         int x, y, junkx, junky;
@@ -1329,44 +1370,37 @@ static int list_windows (Display *disp) {/*{{{*/
         Window junkroot;
 
         /* desktop ID */
-        if ((desktop = (unsigned long *)get_property(disp, client_list[i],
-                XA_CARDINAL, "_NET_WM_DESKTOP", NULL)) == NULL) {
-            desktop = (unsigned long *)get_property(disp, client_list[i],
-                    XA_CARDINAL, "_WIN_WORKSPACE", NULL);
+        if ((desktop = (unsigned long *)get_property(disp, client_list[i],XA_CARDINAL, "_NET_WM_DESKTOP", NULL)) == NULL) 
+        {
+            desktop = (unsigned long *)get_property(disp, client_list[i],XA_CARDINAL, "_WIN_WORKSPACE", NULL);
         }
 
         /* client machine */
-        client_machine = get_property(disp, client_list[i],
-                XA_STRING, "WM_CLIENT_MACHINE", NULL);
+        client_machine = get_property(disp, client_list[i],XA_STRING, "WM_CLIENT_MACHINE", NULL);
        
         /* pid */
-        pid = (unsigned long *)get_property(disp, client_list[i],
-                XA_CARDINAL, "_NET_WM_PID", NULL);
+        pid = (unsigned long *)get_property(disp, client_list[i],XA_CARDINAL, "_NET_WM_PID", NULL);
 
 	    /* geometry */
-        XGetGeometry (disp, client_list[i], &junkroot, &junkx, &junky,
-                          &wwidth, &wheight, &bw, &depth);
-        XTranslateCoordinates (disp, client_list[i], junkroot, junkx, junky,
-                               &x, &y, &junkroot);
+        XGetGeometry (disp, client_list[i], &junkroot, &junkx, &junky,&wwidth, &wheight, &bw, &depth);
+        XTranslateCoordinates (disp, client_list[i], junkroot, junkx, junky,&x, &y, &junkroot);
       
         /* special desktop ID -1 means "all desktops", so we have to convert the desktop value to signed long */
-        printf("0x%.8lx %2ld", client_list[i], 
-                desktop ? (signed long)*desktop : 0);
-        if (options.show_pid) {
+        printf("0x%.8lx %2ld", client_list[i], desktop ? (signed long)*desktop : 0);
+        if (options.show_pid) 
+        {
            printf(" %-6lu", pid ? *pid : 0);
         }
-        if (options.show_geometry) {
+        if (options.show_geometry) 
+        {
            printf(" %-4d %-4d %-4d %-4d", x, y, wwidth, wheight);
         }
-		if (options.show_class) {
+		if (options.show_class) 
+        {
 		   printf(" %-20s ", class_out ? class_out : "N/A");
 		}
 
-        printf(" %*s %s\n",
-              max_client_machine_len,
-              client_machine ? client_machine : "N/A",
-              title_out ? title_out : "N/A"
-		);
+        printf(" %*s %s\n",max_client_machine_len,client_machine ? client_machine : "N/A",title_out ? title_out : "N/A");
         g_free(title_utf8);
         g_free(title_out);
         g_free(desktop);
@@ -1377,7 +1411,7 @@ static int list_windows (Display *disp) {/*{{{*/
     g_free(client_list);
    
     return EXIT_SUCCESS;
-}/*}}}*/
+}
 
 static gchar *get_window_class (Display *disp, Window win) {/*{{{*/
     gchar *class_utf8;
@@ -1401,7 +1435,8 @@ static gchar *get_window_class (Display *disp, Window win) {/*{{{*/
     return class_utf8;
 }/*}}}*/
 
-static gchar *get_window_title (Display *disp, Window win) {/*{{{*/
+static gchar *get_window_title (Display *disp, Window win) 
+{
     gchar *title_utf8;
     gchar *wm_name;
     gchar *net_wm_name;
@@ -1426,10 +1461,13 @@ static gchar *get_window_title (Display *disp, Window win) {/*{{{*/
     g_free(net_wm_name);
     
     return title_utf8;
-}/*}}}*/
+}
 
-static gchar *get_property (Display *disp, Window win, /*{{{*/
-        Atom xa_prop_type, gchar *prop_name, unsigned long *size) {
+
+
+//重要的函数
+static gchar *get_property (Display *disp, Window win, Atom xa_prop_type, gchar *prop_name, unsigned long *size) 
+{
     Atom xa_prop_name;
     Atom xa_ret_type;
     int ret_format;
@@ -1443,39 +1481,53 @@ static gchar *get_property (Display *disp, Window win, /*{{{*/
     
     /* MAX_PROPERTY_VALUE_LEN / 4 explanation (XGetWindowProperty manpage):
      *
-     * long_length = Specifies the length in 32-bit multiples of the
-     *               data to be retrieved.
+     * long_length = Specifies the length in 32-bit multiples of the data to be retrieved. 以32位倍数指定要检索的数据的长度。
      */
-    if (XGetWindowProperty(disp, win, xa_prop_name, 0, MAX_PROPERTY_VALUE_LEN / 4, False,
-            xa_prop_type, &xa_ret_type, &ret_format,     
-            &ret_nitems, &ret_bytes_after, &ret_prop) != Success) {
+    if (XGetWindowProperty(disp, 
+                           win, 
+                           xa_prop_name, 
+                           0, 
+                           MAX_PROPERTY_VALUE_LEN / 4, 
+                           False, 
+                           xa_prop_type, 
+                           &xa_ret_type, 
+                           &ret_format,     
+                           &ret_nitems, 
+                           &ret_bytes_after, &ret_prop) != Success) 
+    {
         p_verbose("Cannot get %s property.\n", prop_name);
         return NULL;
     }
   
-    if (xa_ret_type != xa_prop_type) {
+    if (xa_ret_type != xa_prop_type) 
+    {
         p_verbose("Invalid type of %s property.\n", prop_name);
         XFree(ret_prop);
         return NULL;
     }
 
-    /* null terminate the result to make string handling easier */
+    /* null terminate the result to make string handling easier null终止结果以使字符串处理更容易*/
     tmp_size = (ret_format / (32 / sizeof(long))) * ret_nitems;
     ret = g_malloc(tmp_size + 1);
     memcpy(ret, ret_prop, tmp_size);
     ret[tmp_size] = '\0';
 
-    if (size) {
+    if (size) 
+    {
         *size = tmp_size;
     }
     
     XFree(ret_prop);
     return ret;
-}/*}}}*/
+}
 
-static Window Select_Window(Display *dpy) {/*{{{*/
+
+
+
+static Window Select_Window(Display *dpy) 
+{
     /*
-     * Routine to let user select a window using the mouse
+     * Routine to let user select a window using the mouse  让用户使用鼠标选择窗口的例程
      * Taken from xfree86.
      */
 
@@ -1487,31 +1539,34 @@ static Window Select_Window(Display *dpy) {/*{{{*/
     int dummyi;
     unsigned int dummy;
 
-    /* Make the target cursor */
+    /* Make the target cursor 应该是创建一个鼠标焦点*/
     cursor = XCreateFontCursor(dpy, XC_crosshair);
 
     /* Grab the pointer using target cursor, letting it room all over */
-    status = XGrabPointer(dpy, root, False,
-            ButtonPressMask|ButtonReleaseMask, GrabModeSync,
-            GrabModeAsync, root, cursor, CurrentTime);
-    if (status != GrabSuccess) {
+    status = XGrabPointer(dpy, root, False, ButtonPressMask|ButtonReleaseMask, GrabModeSync, GrabModeAsync, root, cursor, CurrentTime);
+    if (status != GrabSuccess) 
+    {
         fputs("ERROR: Cannot grab mouse.\n", stderr);
         return 0;
     }
 
     /* Let the user select a window... */
-    while ((target_win == None) || (buttons != 0)) {
+    while ((target_win == None) || (buttons != 0)) 
+    {
         /* allow one more event */
         XAllowEvents(dpy, SyncPointer, CurrentTime);
         XWindowEvent(dpy, root, ButtonPressMask|ButtonReleaseMask, &event);
-        switch (event.type) {
-            case ButtonPress:
-                if (target_win == None) {
+        switch (event.type) 
+        {
+            case ButtonPress: //按钮
+                if (target_win == None) 
+                {
                     target_win = event.xbutton.subwindow; /* window selected */
                     if (target_win == None) target_win = root;
                 }
                 buttons++;
                 break;
+
             case ButtonRelease:
                 if (buttons > 0) /* there may have been some down before we started */
                     buttons--;
@@ -1521,27 +1576,28 @@ static Window Select_Window(Display *dpy) {/*{{{*/
 
     XUngrabPointer(dpy, CurrentTime);      /* Done with pointer */
 
-    if (XGetGeometry (dpy, target_win, &root, &dummyi, &dummyi,
-                &dummy, &dummy, &dummy, &dummy) && target_win != root) {
+    if (XGetGeometry (dpy, target_win, &root, &dummyi, &dummyi,&dummy, &dummy, &dummy, &dummy) && target_win != root) 
+    {
         target_win = XmuClientWindow (dpy, target_win);
     }
     
     return(target_win);
-}/*}}}*/
+}
 
-static Window get_active_window(Display *disp) {/*{{{*/
+
+
+static Window get_active_window(Display *disp) 
+{
     char *prop;
     unsigned long size;
     Window ret = (Window)0;
     
-    prop = get_property(disp, DefaultRootWindow(disp), XA_WINDOW, 
-                        "_NET_ACTIVE_WINDOW", &size);
-    if (prop) {
+    prop = get_property(disp, DefaultRootWindow(disp), XA_WINDOW, "_NET_ACTIVE_WINDOW", &size);
+    
+    if (prop) 
+    {
         ret = *((Window*)prop);
         g_free(prop);
     }
-
     return(ret);
-}/*}}}*/
-
-
+}
