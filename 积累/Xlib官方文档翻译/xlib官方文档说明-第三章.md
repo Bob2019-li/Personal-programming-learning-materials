@@ -23,4 +23,19 @@
 
 &emsp;&emsp;Xlib使用不透明的视觉(Visual)结构，其中包含有关可能的颜色映射的信息。可视化实用程序函数(参见 **Determining the Appropriate Visual Type 确定适当的可视化类型**)使用**XVisualInfo**结构将此信息返回给应用程序。与本次讨论相关的结构成员是类、红色遮罩、绿色遮罩、蓝色遮罩、每rgb位和彩色贴图大小。类成员指定屏幕的一个可能的视觉类，可以是**StaticGray、StaticColor、TrueColor、GrayScale、PseudoColor或DirectColor。**  
 
-&emsp;&emsp;以下概念可能有助于更清楚地解释视觉类型。屏幕可以是彩色或者灰度，可以具有可写或只读的颜色映射，还可以有一个彩色地图，其索引被分解为单独的RGB片段，前提是在一个不是灰度的屏幕上。
+&emsp;&emsp;以下概念可能有助于更清楚地解释视觉类型。屏幕可以是彩色或者灰度，可以具有可写或只读的颜色映射，还可以有一个彩色地图，其索引被分解为单独的RGB片段，前提是在一个不是灰度的屏幕上。如下图所示: 这个表格完全看不懂
+||颜色||灰度||
+|----|----|----|----|----|
+||只读模式|读写模式|只读模式|读写模式|
+|未分解颜色映射 Undecomposed Colormap|静态颜色 Static Color|伪彩色 Pseudo Color|静态灰度 Static Gray|灰度 Gray Scale|
+|分解颜色映射 Decomposed Colormap|真是色彩 True Color|直接着色 Direct Color|||
+
+&emsp;&emsp;从概念上讲，当每个像素从视频内存中读出并显示在屏幕上时，它会经历一个通过索引到颜色map来查找阶段。颜色map索引可以在某些硬件上任意操作，在其他硬件上以有限的方式操作，而在其他硬件上则完全不能。视觉类型通过以下方法影响颜色map和RGB数值:
+* 对于伪彩色**PseudoColor**，一个像素值通过颜色map进行索引，生成一个独立的RGB值，而且这个RGB值可以动态更改。
+* 除了驱动屏幕的主色调未定义外，灰度**GrayScale**的处理方式与伪色**PseudoColor**相同。因此，客户机应该始终在颜色map中存储相同的红色、绿色和蓝色值。
+* 对于**DirectColor**，像素值被分解为单独的RGB子域，而且每个子域分别地在颜色map中建立映射关系。RGB值可以动态更改。
+* 除了颜色map具有预定义，只读的RGB值，**TrueColor**的处理方式和**DirectColor**相同。这些RGB值取决于服务器，但在每个主服务器中提供线性或接近线性的斜坡(These RGB values are server-dependent but provide linear or near-linear ramps in each primary.)。
+* 除了颜色map具有预定义、只读、依赖服务的RGB数值，**StaticColor**和**PseudoColor**的处理方式相同。
+* 除了对于任何像素值都是相等的RGB(因此会产生灰度阴影)，**StaticGray**与**StaticColor**的处理方式相同。带有两个颜色map入口的**StaticGray**可以被认为是单色。
+
+&emsp;&emsp;红色遮罩、绿色遮罩和蓝色遮罩成员仅为**DirectColor**和**TrueColor**定义。每个都有一组连续的位，没有交叉点。bits_per_rgb成员指定红色、绿色和蓝色的不同颜色值（分别）的对数基数2。实际RGB值是无符号16位数字。colormap_size成员定义新创建的colormap中可用colormap条目的数量。对于**DirectColor**和**TrueColor**，这是单个像素子字段的大小。 (完全看不懂，硬着头皮翻译的)
