@@ -1,0 +1,7 @@
+按照网上文章自己写的一个插件管理demo
+
+https://www.devbean.net/2012/05/building-your-own-plugin-framework-catalog/  
+
+自己只是做了一个阉割版的效果  抛弃了 跨平台  静态库  兼容纯C这些特性
+
+现在好多手法都没看懂，也不知道在实际情况下怎么用，以后再有感悟会完善这个demo
