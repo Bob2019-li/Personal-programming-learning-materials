@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.10.1, 2022-02-02T17:22:56. -->
+<!-- Written by QtCreator 4.10.1, 2022-02-07T22:03:37. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -307,8 +307,8 @@
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">test</value>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName"></value>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:C:/Users/Administrator/Desktop/cppPlug/test/test.pro</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">test2</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:C:/Users/Administrator/Desktop/学习资料/Personal-programming-learning-materials/C&amp;C++基础知识/C++插件化开发专题/cppPlug-2/test/test.pro</value>
     <value type="QString" key="RunConfiguration.Arguments"></value>
     <value type="uint" key="RunConfiguration.QmlDebugServerPort">3768</value>
     <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>
