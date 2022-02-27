@@ -1,0 +1,16 @@
+#widget
+{
+   background-color: black;
+}
+
+
+#widget QPushButton
+{
+    background-color: aquamarine;
+    border-radius: 5px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: rgb(236, 240, 16);
+    max-height: 30px;
+    min-height: 30px;
+}

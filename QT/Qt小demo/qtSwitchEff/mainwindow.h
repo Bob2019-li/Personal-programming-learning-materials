@@ -5,7 +5,15 @@
 #include <QPropertyAnimation>
 #include <QString>
 #include <QPoint>
-
+#include <QEvent>
+#include <QDebug>
+#include <QVector>
+#include <QPushButton>
+#include <QMap>
+#include <QHBoxLayout>
+#include <QParallelAnimationGroup>
+#include <QFile>
+#include <QMetaProperty>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -20,18 +28,17 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_btn_up_clicked();
-
-    void on_btn_down_clicked();
-
     void on_btn_left_clicked();
-
-    void on_btn_right_clicked();
-
+    void SlotFinished();
 private:
     Ui::MainWindow *ui;
-    QPropertyAnimation * m_panimation;
-    void DealAnimation(int pox,int poxy);
+    QMap<QPushButton *,QPropertyAnimation *> m_mapbtn;
+    QParallelAnimationGroup * m_pAnimgroup;
+    QVector<QPushButton *> m_vecbtn;
+
+
+    void SetAnimation(QPushButton * pbtn, int xoffset,int yoffset);
+    void SetSkin();
 
 };
 #endif // MAINWINDOW_H
